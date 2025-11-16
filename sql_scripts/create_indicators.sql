@@ -1,15 +1,12 @@
+DROP TABLE IF EXISTS Indicators;
+
 CREATE TABLE Indicators (
     id SERIAL PRIMARY KEY,
-    
-    category_id INT,
-    
+
+    indicator_code VARCHAR(100) UNIQUE NOT NULL,
     indicator_name VARCHAR(255) NOT NULL,
-    indicator_code VARCHAR(100) UNIQUE,
     unit_of_measure VARCHAR(100),
-    
-    CONSTRAINT fk_category
-        FOREIGN KEY(category_id)
-        REFERENCES IndicatorCategories(id)
+
+    category_id INT REFERENCES IndicatorCategories(id),
+    source_id INT REFERENCES DataSources(id)
 );
-
-

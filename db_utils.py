@@ -41,3 +41,11 @@ def execute_query(query, params=None, fetch=False):
     finally:
         cursor.close()
         conn.close()
+
+def get_countries_by_region(conn, region_id):
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT country_name, country_code_alpha3 FROM Countries WHERE region_id = %s",
+        (region_id,)
+    )
+    return cur.fetchall()
