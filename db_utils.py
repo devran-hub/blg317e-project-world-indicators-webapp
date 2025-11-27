@@ -175,10 +175,22 @@ def delete_indicator(code):
 # IndicatorData Table
 # -------------------------------------------------------------------
 
-def get_data_by_country(country_code):
-    """Belirli bir ülkeye ait tüm yılları ve göstergeleri getirir"""
+def get_all_indicator_data(limit=100):
+    """List all indicator data with country & indicator names"""
     sql = """
-    SELECT d.*, i.indicator_name 
+    SELECT d.id, c.country_name, i.indicator_name, d.year, d.value, d.footnote
+    FROM IndicatorData d
+    JOIN Countries c ON d.country_code = c.country_code
+    JOIN Indicators i ON d.indicator_code = i.indicator_code
+    ORDER BY d.year DESC
+    LIMIT %s
+    """
+    return execute_query(sql, (limit,), fetch=True)
+
+def get_data_by_country(country_code):
+    """Get all indicator data for one country"""
+    sql = """
+    SELECT d.*, i.indicator_name
     FROM IndicatorData d
     JOIN Indicators i ON d.indicator_code = i.indicator_code
     WHERE d.country_code = %s
@@ -187,9 +199,9 @@ def get_data_by_country(country_code):
     return execute_query(sql, (country_code,), fetch=True)
 
 def get_data_by_indicator_and_year(indicator_code, year):
-    """Belirli bir gösterge ve yıl için tüm ülke verilerini getirir"""
+    """Get all countries’ data for a specific indicator/year"""
     sql = """
-    SELECT d.*, c.country_name 
+    SELECT d.*, c.country_name
     FROM IndicatorData d
     JOIN Countries c ON d.country_code = c.country_code
     WHERE d.indicator_code = %s AND d.year = %s
@@ -205,9 +217,11 @@ def add_indicator_data(country_code, indicator_code, year, value, footnote=""):
     return execute_query(sql, (country_code, indicator_code, year, value, footnote))
 
 def update_indicator_data(id, value, footnote):
-    # Data güncellemelerinde genellikle sadece değer ve not değişir
+    """Update numeric value or footnote for a row"""
     sql = "UPDATE IndicatorData SET value=%s, footnote=%s WHERE id=%s"
     return execute_query(sql, (value, footnote, id))
 
 def delete_indicator_data(id):
-    return execute_query("DELETE FROM IndicatorData WHERE id=%s", (id,))
+    """Delete a record by ID"""
+    sql = "DELETE FROM IndicatorData WHERE id=%s"
+    return execute_query(sql, (id,))
