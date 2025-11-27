@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import os
+import db_utils
 
 from db_utils import (
     # Regions
@@ -52,7 +53,6 @@ def delete_region_route(id):
         flash('Silinemedi. Bu bölgeye bağlı ülkeler olabilir.', 'danger')
     return redirect(url_for('regions'))
 
-
 # -----------------------------------------------------------
 # Sources
 # -----------------------------------------------------------
@@ -68,13 +68,13 @@ def add_source_route():
         org = request.form.get('source_organization')
         url = request.form.get('source_url')
         desc = request.form.get('description')
-        
+
         if add_source(name, org, url, desc):
             flash('Kaynak eklendi.', 'success')
             return redirect(url_for('sources'))
         else:
             flash('Hata oluştu.', 'danger')
-    
+
     return render_template('source_form.html', action="Ekle")
 
 @app.route('/sources/delete/<int:id>', methods=['POST'])
@@ -192,7 +192,6 @@ def add_indicator_route():
         else:
             flash('Hata: Kod benzersiz olmalı.', 'danger')
 
-    # Dropdown listesinde göstermek için parent tabloları da ekle
     categories = get_all_categories()
     sources = get_all_sources()
     return render_template('indicator_form.html', categories=categories, sources=sources, action="Ekle")
@@ -206,17 +205,47 @@ def delete_indicator_route(code):
     return redirect(url_for('indicators'))
 
 # -----------------------------------------------------------
-# Indicator Data
+# Indicator Data (Extended)
 # -----------------------------------------------------------
 
-# Ülke Detay Sayfası: O ülkeye ait verileri listeler
+# Full list view (all rows)
+@app.route('/indicator-data')
+def indicator_data_list():
+    rows = db_utils.get_all_indicator_data()
+    return render_template('indicator_data.html', rows=rows)
+
+# Add new row
+@app.route('/indicator-data/add', methods=['POST'])
+def add_indicator_data_route():
+    db_utils.add_indicator_data(
+        request.form["country_code"],
+        request.form["indicator_code"],
+        request.form["year"],
+        request.form["value"],
+        request.form["footnote"]
+    )
+    return redirect(url_for('indicator_data_list'))
+
+# Update an existing row
+@app.route('/indicator-data/update/<int:id>', methods=['POST'])
+def update_indicator_data_route(id):
+    db_utils.update_indicator_data(id, request.form["value"], request.form["footnote"])
+    return redirect(url_for('indicator_data_list'))
+
+# Delete a row
+@app.route('/indicator-data/delete/<int:id>')
+def delete_indicator_data_route(id):
+    db_utils.delete_indicator_data(id)
+    return redirect(url_for('indicator_data_list'))
+
+# Country-specific data view
 @app.route('/data/country/<string:code>')
 def country_data(code):
     country = get_country_by_code(code)
     data = get_data_by_country(code)
     return render_template('indicator_data.html', country=country, data=data)
 
-# Yeni Veri Ekleme (Hangi Ülke, Hangi Yıl, Hangi Gösterge)
+# Add data (form)
 @app.route('/data/add', methods=['GET', 'POST'])
 def add_data_route():
     if request.method == 'POST':
@@ -228,12 +257,10 @@ def add_data_route():
 
         if add_indicator_data(country_code, indicator_code, year, value, footnote):
             flash('Veri başarıyla eklendi.', 'success')
-            # Eklenen ülkenin detayına yönlendir
             return redirect(url_for('country_data', code=country_code))
         else:
             flash('Hata oluştu. (Belki bu yıl için veri zaten var?)', 'danger')
 
-    # Dropdownlar için tüm listeler lazım
     countries = get_all_countries()
     indicators = get_all_indicators()
     return render_template('data_form.html', countries=countries, indicators=indicators)
@@ -246,5 +273,9 @@ def delete_data_route(id, return_country_code):
         flash('Silinemedi.', 'danger')
     return redirect(url_for('country_data', code=return_country_code))
 
+
+# -----------------------------------------------------------
+# Run Flask
+# -----------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
