@@ -1,0 +1,62 @@
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.table {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    font-size: 0.95rem;
+}
+
+.table thead {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+}
+
+.table td, .table th {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.input {
+    background: white;
+    border: 1px solid #d1d5db;
+    padding: 10px 14px;
+    border-radius: 8px;
+    width: 220px;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+}
+
+.btn-info {
+    background: #0ea5e9;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+}

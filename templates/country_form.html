@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Country Form{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-6">{{ action }} Country</h1>
+
+<div class="card">
+
+    <form method="POST" class="space-y-4">
+
+        <input name="country_code" value="{{ country.country_code if country }}" placeholder="Country Code" class="border p-2 rounded w-full">
+
+        <input name="country_name" value="{{ country.country_name if country }}" placeholder="Country Name" class="border p-2 rounded w-full">
+
+        <input name="capital_city" value="{{ country.capital_city if country }}" placeholder="Capital City" class="border p-2 rounded w-full">
+
+        <select name="region_id" class="border p-2 rounded w-full">
+            {% for r in regions %}
+            <option value="{{ r.id }}" {% if country and country.region_id==r.id %}selected{% endif %}>
+                {{ r.region_name }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <input name="income_level" value="{{ country.income_level if country }}" placeholder="Income Level" class="border p-2 rounded w-full">
+
+        <button class="btn btn-blue w-full">{{ action }}</button>
+    </form>
+
+</div>
+
+{% endblock %}

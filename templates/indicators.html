@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Indicators{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Indicators</h1>
+
+<a href="/indicators/add" 
+    class="btn btn-blue mb-5 inline-block">
+    + Add Indicator
+</a>
+
+<div class="card">
+    <table class="w-full">
+        <thead>
+            <tr class="border-b text-left">
+                <th class="py-2">Code</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Source</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in indicators %}
+            <tr class="border-b">
+                <td class="py-2">{{ i.indicator_code }}</td>
+                <td>{{ i.indicator_name }}</td>
+                <td>{{ i.category_name }}</td>
+                <td>{{ i.source_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

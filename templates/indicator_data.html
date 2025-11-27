@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ country.country_name }} – Indicator Data{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-6">
+    {{ country.country_name }} – Indicator Data
+</h1>
+
+<a href="/data/add" class="btn btn-blue mb-5 inline-block">
+    + Add Data
+</a>
+
+<div class="card">
+    <table class="w-full">
+        <thead>
+            <tr class="border-b text-left">
+                <th class="py-2">Indicator</th>
+                <th>Year</th>
+                <th>Value</th>
+                <th>Footnote</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr class="border-b">
+                <td class="py-2">{{ row.indicator_name }}</td>
+                <td>{{ row.year }}</td>
+                <td>{{ row.value }}</td>
+                <td>{{ row.footnote }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

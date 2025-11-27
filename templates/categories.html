@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Indicator Categories</h1>
+
+<form method="POST" action="{{ url_for('add_category_route') }}" class="flex gap-4 mb-6">
+    <input name="category_name" class="input" placeholder="Category Name" required>
+    <input name="description" class="input" placeholder="Description">
+    <button class="btn-primary">Add</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in categories %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.category_name }}</td>
+            <td>{{ c.description }}</td>
+            <td class="text-right">
+                
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

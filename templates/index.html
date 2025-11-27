@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - World Development Indicators{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-900">Dashboard</h2>
+    <p class="text-gray-600 mt-2">Overview of global development indicators</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Total Regions -->
+    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm font-medium">Total Regions</p>
+                <p class="text-3xl font-bold text-blue-600 mt-2">{{ total_regions }}</p>
+            </div>
+            <div class="bg-blue-100 rounded-full p-3">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Countries -->
+    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm font-medium">Total Countries</p>
+                <p class="text-3xl font-bold text-green-600 mt-2">{{ total_countries }}</p>
+            </div>
+            <div class="bg-green-100 rounded-full p-3">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Indicators -->
+    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm font-medium">Total Indicators</p>
+                <p class="text-3xl font-bold text-purple-600 mt-2">{{ total_indicators }}</p>
+            </div>
+            <div class="bg-purple-100 rounded-full p-3">
+                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Sources -->
+    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm font-medium">Total Sources</p>
+                <p class="text-3xl font-bold text-orange-600 mt-2">{{ total_sources }}</p>
+            </div>
+            <div class="bg-orange-100 rounded-full p-3">
+                <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Global Population Chart -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Global Population Trend</h3>
+        <canvas id="populationChart"></canvas>
+    </div>
+
+    <!-- Global GDP Chart -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Global GDP Trend</h3>
+        <canvas id="gdpChart"></canvas>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Life Expectancy Chart -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Global Life Expectancy</h3>
+        <canvas id="lifeExpectancyChart"></canvas>
+    </div>
+
+    <!-- World Map Placeholder -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Top 10 Countries by Population</h3>
+        <div class="space-y-3">
+            {% for country in country_populations %}
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span class="font-medium text-gray-900">{{ country.country_name }}</span>
+                <span class="text-sm text-gray-600">{{ '{:,.0f}'.format(country.population) }} ({{ country.year }})</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Population Chart
+    const populationData = {{ population_data | tojson }};
+    if (populationData && populationData.length > 0) {
+        new Chart(document.getElementById('populationChart'), {
+            type: 'line',
+            data: {
+                labels: populationData.map(d => d.year),
+                datasets: [{
+                    label: 'Average Population',
+                    data: populationData.map(d => d.avg_value),
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    }
+
+    // GDP Chart
+    const gdpData = {{ gdp_data | tojson }};
+    if (gdpData && gdpData.length > 0) {
+        new Chart(document.getElementById('gdpChart'), {
+            type: 'line',
+            data: {
+                labels: gdpData.map(d => d.year),
+                datasets: [{
+                    label: 'Average GDP',
+                    data: gdpData.map(d => d.avg_value),
+                    borderColor: 'rgb(34, 197, 94)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    }
+
+    // Life Expectancy Chart
+    const lifeExpectancyData = {{ life_expectancy_data | tojson }};
+    if (lifeExpectancyData && lifeExpectancyData.length > 0) {
+        new Chart(document.getElementById('lifeExpectancyChart'), {
+            type: 'line',
+            data: {
+                labels: lifeExpectancyData.map(d => d.year),
+                datasets: [{
+                    label: 'Average Life Expectancy (years)',
+                    data: lifeExpectancyData.map(d => d.avg_value),
+                    borderColor: 'rgb(168, 85, 247)',
+                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

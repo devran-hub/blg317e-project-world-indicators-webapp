@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Sources{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Sources</h1>
+
+<a href="{{ url_for('add_source_route') }}" class="btn-primary mb-6 inline-block">Add New Source</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Source Name</th>
+            <th>Organization</th>
+            <th>URL</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in sources %}
+        <tr>
+            <td>{{ s.id }}</td>
+            <td>{{ s.source_name }}</td>
+            <td>{{ s.source_organization }}</td>
+            <td><a href="{{ s.source_url }}" class="text-blue-600" target="_blank">Visit</a></td>
+            <td class="text-right">
+                
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

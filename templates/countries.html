@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Countries{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-6">Countries</h1>
+
+<a href="/countries/add" class="btn btn-blue mb-5 inline-block">+ Add Country</a>
+
+<div class="card">
+    <table class="w-full">
+        <thead>
+            <tr class="border-b text-left">
+                <th class="py-2">Code</th>
+                <th>Name</th>
+                <th>Capital</th>
+                <th>Region</th>
+                <th>Income</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in countries %}
+            <tr class="border-b">
+                <td class="py-2">{{ c.country_code }}</td>
+                <td>{{ c.country_name }}</td>
+                <td>{{ c.capital_city }}</td>
+                <td>{{ c.region_name }}</td>
+                <td>{{ c.income_level }}</td>
+
+                <td class="text-right flex gap-2">
+                    <a href="/countries/edit/{{ c.country_code }}" class="btn btn-blue">Edit</a>
+
+                    
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
