@@ -1,31 +1,183 @@
-## blg317e-project-world-indicators-webapp
+🌍 World Development Indicators — Web Application
 
-World Development Indicators-based database and SQL scripts for a web app that compares and visualizes development metrics across countries and time.
+A Flask-based web dashboard for viewing and managing World Bank Development Indicators.
+Supports regions, countries, indicators, indicator categories, sources, and time-series data visualization using Chart.js.
 
-### Schema
+📌 Features
+✅ Dashboard
 
-- Main tables: `Regions`, `Countries`, `IndicatorCategories`, `Indicators`, `IndicatorData`
-- Helper table: `DataSources`
+Global statistics (total regions, countries, indicators, sources)
 
-### Setup (run in this order)
+Line charts for:
 
-1. `sql_scripts/create_datasources.sql`
-2. `sql_scripts/create_regions.sql`
-3. `sql_scripts/create_countries.sql`
-4. `sql_scripts/create_indicator_categories.sql`
-5. `sql_scripts/create_indicators.sql`
-6. `sql_scripts/create_indicator_data.sql`
-7. `sql_scripts/insert_sample_data.sql`
-8. (Optional) `sql_scripts/create_indexes_yunus.sql`
+Global Population (SP.POP.TOTL)
 
-### Queries
+GDP (NY.GDP.MKTP.CD)
 
-- Member-specific queries:
-  - `sql_scripts/queries_yunus.sql` (Indicators, IndicatorCategories, IndicatorData)
-  - `sql_scripts/queries_mfatih.sql`
-  - `sql_scripts/queries_ahmet.sql`
-  - `sql_scripts/create_queries_fatih.sql`
+Life Expectancy (SP.DYN.LE00.IN)
 
-Notes:
+✅ Regions
 
-- Some queries use bind parameters like `:indicator_code`, `:year`, `:country_code`. Replace with your SQL client's parameter syntax as needed.
+List all regions
+
+Add new region
+
+Delete region
+
+✅ Countries
+
+List all countries with region name
+
+Add new country
+
+Edit existing country
+
+Delete country
+
+View indicator data for each country
+
+✅ Indicators
+
+List indicators with category + source
+
+Add new indicator
+
+Delete indicator
+
+✅ Indicator Categories
+
+List categories
+
+Add new category
+
+Delete category
+
+✅ Sources
+
+List sources
+
+Add new source
+
+Delete source
+
+✅ Indicator Data
+
+List all data entries for a country
+
+Add new indicator data
+
+Delete data entries
+
+🏛️ Technology Stack
+Component	Technology
+Backend	Flask (Python)
+Database	MySQL
+Frontend	Tailwind CSS, Chart.js, HTML/Jinja2
+ORM/DB	mysql-connector-python
+Structure	MVC-style Flask project
+📂 Project Structure
+blg317e-project-world-indicators-webapp/
+│
+├── app.py                      # Main Flask application
+├── db_utils.py                 # All database functions
+├── database/
+│    └── db_connect.py          # MySQL connection setup
+│
+├── static/
+│    ├── css/
+│    │    └── style.css
+│    └── ...
+│
+├── templates/
+│    ├── base.html
+│    ├── index.html
+│    ├── regions.html
+│    ├── countries.html
+│    ├── indicators.html
+│    ├── indicator_data.html
+│    ├── sources.html
+│    ├── categories.html
+│    └── forms…
+│
+└── README.md
+
+⚙️ Installation
+1️⃣ Clone the Repository
+git clone https://github.com/yourusername/world-indicators-webapp.git
+cd world-indicators-webapp
+
+2️⃣ Create Virtual Environment
+python3 -m venv venv
+source venv/bin/activate
+
+3️⃣ Install Requirements
+pip install -r requirements.txt
+
+🛢️ Database Setup
+1️⃣ Create MySQL Database
+CREATE DATABASE wdi;
+USE wdi;
+
+2️⃣ Import Schema
+
+Import the SQL file:
+
+mysql -u root -p wdi < database/schema_only.sql
+
+3️⃣ Configure Connection
+
+Edit:
+
+database/db_connect.py
+
+
+Example:
+
+def get_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="YOUR_PASSWORD",
+        database="wdi"
+    )
+
+🚀 Run the Application
+
+After installing everything:
+
+python app.py
+
+
+Visit:
+
+http://127.0.0.1:5000
+
+📊 Preview
+
+The app includes:
+
+Modern responsive dashboard
+
+Chart.js visualization
+
+CRUD operations
+
+Dynamic Jinja templates
+
+(Screen-shots or GIF can be added here)
+
+🧑‍💻 Developers
+
+Ali Huseynov
+Mehmet Fatih Kaya
+Devrim Polat
+Ahmet Yusuf Kurukız
+Yunus Korkmaz
+
+BLG317E — Database Systems
+Istanbul Technical University
+
+📄 License
+
+This project is for academic use.
+You may extend and modify it freely.
