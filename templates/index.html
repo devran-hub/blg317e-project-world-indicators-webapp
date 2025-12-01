@@ -1,192 +1,293 @@
 {% extends "base.html" %}
-
-{% block title %}Dashboard - World Development Indicators{% endblock %}
+{% block title %}Dashboard - World Indicators{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-900">Dashboard</h2>
-    <p class="text-gray-600 mt-2">Overview of global development indicators</p>
+<!-- Hero Section -->
+<div class="mb-12 text-center animate-fade-in">
+    <h1
+        class="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 mb-4">
+        Global Insights
+    </h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        Explore comprehensive development indicators from around the world. Visualize trends in health, education, and
+        economy.
+    </p>
 </div>
 
-<!-- Stats Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <!-- Total Regions -->
-    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-600 text-sm font-medium">Total Regions</p>
-                <p class="text-3xl font-bold text-blue-600 mt-2">{{ total_regions }}</p>
-            </div>
-            <div class="bg-blue-100 rounded-full p-3">
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+    <div class="glass-card p-6 rounded-2xl animate-fade-in delay-100">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Regions</h3>
+            <div class="p-2 bg-blue-100 rounded-lg">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                    </path>
                 </svg>
             </div>
         </div>
-    </div>
-
-    <!-- Total Countries -->
-    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-600 text-sm font-medium">Total Countries</p>
-                <p class="text-3xl font-bold text-green-600 mt-2">{{ total_countries }}</p>
-            </div>
-            <div class="bg-green-100 rounded-full p-3">
-                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path>
-                </svg>
-            </div>
+        <p class="text-4xl font-bold text-gray-800">{{ total_regions }}</p>
+        <div class="mt-2 text-sm text-green-600 flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Active Regions</span>
         </div>
     </div>
 
-    <!-- Total Indicators -->
-    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-600 text-sm font-medium">Total Indicators</p>
-                <p class="text-3xl font-bold text-purple-600 mt-2">{{ total_indicators }}</p>
-            </div>
-            <div class="bg-purple-100 rounded-full p-3">
-                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+    <div class="glass-card p-6 rounded-2xl animate-fade-in delay-200">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Countries</h3>
+            <div class="p-2 bg-purple-100 rounded-lg">
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                    </path>
                 </svg>
             </div>
         </div>
+        <p class="text-4xl font-bold text-gray-800">{{ total_countries }}</p>
+        <div class="mt-2 text-sm text-purple-600 flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+            <span>Tracked Nations</span>
+        </div>
     </div>
 
-    <!-- Total Sources -->
-    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-600 text-sm font-medium">Total Sources</p>
-                <p class="text-3xl font-bold text-orange-600 mt-2">{{ total_sources }}</p>
-            </div>
-            <div class="bg-orange-100 rounded-full p-3">
-                <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+    <div class="glass-card p-6 rounded-2xl animate-fade-in delay-300">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Indicators</h3>
+            <div class="p-2 bg-pink-100 rounded-lg">
+                <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z">
+                    </path>
                 </svg>
             </div>
+        </div>
+        <p class="text-4xl font-bold text-gray-800">{{ total_indicators }}</p>
+        <div class="mt-2 text-sm text-pink-600 flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                </path>
+            </svg>
+            <span>Data Points</span>
+        </div>
+    </div>
+
+    <div class="glass-card p-6 rounded-2xl animate-fade-in delay-300">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Sources</h3>
+            <div class="p-2 bg-orange-100 rounded-lg">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <p class="text-4xl font-bold text-gray-800">{{ total_sources }}</p>
+        <div class="mt-2 text-sm text-orange-600 flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Verified Sources</span>
         </div>
     </div>
 </div>
 
 <!-- Charts Section -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <!-- Global Population Chart -->
-    <div class="bg-white rounded-xl shadow-md p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Global Population Trend</h3>
-        <canvas id="populationChart"></canvas>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+    <!-- Population Chart -->
+    <div class="glass-card p-6 rounded-2xl">
+        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <span class="w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
+            Global Population Trend
+        </h2>
+        <div class="relative h-80">
+            <canvas id="populationChart"></canvas>
+        </div>
     </div>
 
-    <!-- Global GDP Chart -->
-    <div class="bg-white rounded-xl shadow-md p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Global GDP Trend</h3>
-        <canvas id="gdpChart"></canvas>
+    <!-- GDP Chart -->
+    <div class="glass-card p-6 rounded-2xl">
+        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <span class="w-2 h-8 bg-green-500 rounded-full mr-3"></span>
+            Global GDP Growth
+        </h2>
+        <div class="relative h-80">
+            <canvas id="gdpChart"></canvas>
+        </div>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <!-- Life Expectancy Chart -->
-    <div class="bg-white rounded-xl shadow-md p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Global Life Expectancy</h3>
-        <canvas id="lifeExpectancyChart"></canvas>
+<!-- Bottom Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Top Countries Table -->
+    <div class="lg:col-span-2 glass-card p-6 rounded-2xl">
+        <h2 class="text-xl font-bold text-gray-800 mb-6">Most Populous Countries</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr
+                        class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                        <th class="pb-3 pl-2">Country</th>
+                        <th class="pb-3">Population</th>
+                        <th class="pb-3">Year</th>
+                        <th class="pb-3">Trend</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm divide-y divide-gray-100">
+                    {% for country in country_populations %}
+                    <tr class="hover:bg-blue-50/50 transition-colors">
+                        <td class="py-3 pl-2 font-medium text-gray-800">{{ country.country_name }}</td>
+                        <td class="py-3 text-gray-600">{{ "{:,.0f}".format(country.population) }}</td>
+                        <td class="py-3 text-gray-500">{{ country.year }}</td>
+                        <td class="py-3">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                                Rising
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- World Map Placeholder -->
-    <div class="bg-white rounded-xl shadow-md p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Top 10 Countries by Population</h3>
-        <div class="space-y-3">
-            {% for country in country_populations %}
-            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span class="font-medium text-gray-900">{{ country.country_name }}</span>
-                <span class="text-sm text-gray-600">{{ '{:,.0f}'.format(country.population) }} ({{ country.year }})</span>
-            </div>
-            {% endfor %}
+    <!-- Life Expectancy Chart -->
+    <div class="glass-card p-6 rounded-2xl">
+        <h2 class="text-xl font-bold text-gray-800 mb-6">Life Expectancy</h2>
+        <div class="relative h-64">
+            <canvas id="lifeExpectancyChart"></canvas>
+        </div>
+        <div class="mt-6 p-4 bg-blue-50 rounded-xl">
+            <p class="text-sm text-blue-800">
+                <strong>Did you know?</strong> Global life expectancy has increased by over 6 years since 2000,
+                reflecting improvements in healthcare and living standards.
+            </p>
         </div>
     </div>
 </div>
 
 <script>
+    // Chart Defaults
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#6b7280';
+
     // Population Chart
-    const populationData = {{ population_data | tojson }};
-    if (populationData && populationData.length > 0) {
-        new Chart(document.getElementById('populationChart'), {
-            type: 'line',
-            data: {
-                labels: populationData.map(d => d.year),
-                datasets: [{
-                    label: 'Average Population',
-                    data: populationData.map(d => d.avg_value),
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: { beginAtZero: false }
+    const popCtx = document.getElementById('populationChart').getContext('2d');
+    new Chart(popCtx, {
+        type: 'line',
+        data: {
+            labels: {{ population_data | map(attribute = 'year') | list | tojson }},
+        datasets: [{
+            label: 'Total Population',
+            data: {{ population_data | map(attribute = 'avg_value') | list | tojson }},
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 6
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: '#1f2937',
+                bodyColor: '#4b5563',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                padding: 10,
+                callbacks: {
+                    label: function (context) {
+                        return (context.raw / 1000000000).toFixed(2) + ' Billion';
+                    }
                 }
             }
-        });
+        },
+        scales: {
+            y: {
+                grid: { borderDash: [2, 4], color: '#f3f4f6' },
+                ticks: { callback: function (value) { return (value / 1000000000).toFixed(1) + 'B'; } }
+            },
+            x: { grid: { display: false } }
+        }
     }
+    });
 
     // GDP Chart
-    const gdpData = {{ gdp_data | tojson }};
-    if (gdpData && gdpData.length > 0) {
-        new Chart(document.getElementById('gdpChart'), {
-            type: 'line',
-            data: {
-                labels: gdpData.map(d => d.year),
-                datasets: [{
-                    label: 'Average GDP',
-                    data: gdpData.map(d => d.avg_value),
-                    borderColor: 'rgb(34, 197, 94)',
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    tension: 0.4
-                }]
+    const gdpCtx = document.getElementById('gdpChart').getContext('2d');
+    new Chart(gdpCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ gdp_data | map(attribute = 'year') | list | tojson }},
+        datasets: [{
+            label: 'Global GDP',
+            data: {{ gdp_data | map(attribute = 'avg_value') | list | tojson }},
+        backgroundColor: '#10b981',
+        borderRadius: 4,
+        hoverBackgroundColor: '#059669'
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: {
+                grid: { borderDash: [2, 4], color: '#f3f4f6' },
+                ticks: { callback: function (value) { return '$' + (value / 1000000000000).toFixed(1) + 'T'; } }
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: { beginAtZero: false }
-                }
-            }
-        });
+            x: { grid: { display: false } }
+        }
     }
+    });
 
     // Life Expectancy Chart
-    const lifeExpectancyData = {{ life_expectancy_data | tojson }};
-    if (lifeExpectancyData && lifeExpectancyData.length > 0) {
-        new Chart(document.getElementById('lifeExpectancyChart'), {
-            type: 'line',
-            data: {
-                labels: lifeExpectancyData.map(d => d.year),
-                datasets: [{
-                    label: 'Average Life Expectancy (years)',
-                    data: lifeExpectancyData.map(d => d.avg_value),
-                    borderColor: 'rgb(168, 85, 247)',
-                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: { beginAtZero: false }
-                }
-            }
-        });
+    const lifeCtx = document.getElementById('lifeExpectancyChart').getContext('2d');
+    new Chart(lifeCtx, {
+        type: 'line',
+        data: {
+            labels: {{ life_expectancy_data | map(attribute = 'year') | list | tojson }},
+        datasets: [{
+            label: 'Life Expectancy',
+            data: {{ life_expectancy_data | map(attribute = 'avg_value') | list | tojson }},
+        borderColor: '#ec4899',
+        borderWidth: 3,
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 6
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: { grid: { display: false } },
+            x: { grid: { display: false } }
+        }
     }
+    });
 </script>
 {% endblock %}

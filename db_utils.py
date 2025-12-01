@@ -142,6 +142,20 @@ def get_all_indicators():
         fetch=True
     )
 
+def get_indicators_by_category_name(category_name):
+    return execute(
+        """
+        SELECT I.*, C.category_name, S.source_name
+        FROM Indicators I
+        LEFT JOIN IndicatorCategories C ON I.category_id = C.id
+        LEFT JOIN Sources S ON I.source_id = S.id
+        WHERE C.category_name LIKE %s
+        ORDER BY I.indicator_name
+        """,
+        (f"%{category_name}%",),
+        fetch=True
+    )
+
 def add_indicator(code, name, definition, unit, cat_id, source_id):
     return execute(
         """

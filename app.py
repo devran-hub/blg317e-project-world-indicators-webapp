@@ -10,7 +10,8 @@ from db_utils import (
     get_global_population,
     get_global_gdp,
     get_global_life_expectancy,
-    get_latest_population_by_country
+    get_latest_population_by_country,
+    get_indicators_by_category_name
 )
 
 app = Flask(__name__)
@@ -120,6 +121,36 @@ def indicators():
                          categories=all_categories,
                          sources=all_sources)
 
+@app.route('/health')
+def health():
+    """Health indicators"""
+    indicators = get_indicators_by_category_name('Health')
+    # Fallback if 'Health' category doesn't exist yet, try 'Life Expectancy' or similar if needed
+    # For now, we rely on the LIKE query in db_utils
+    return render_template('category_indicators.html', 
+                         title='Health Indicators',
+                         indicators=indicators,
+                         active_page='health')
+
+@app.route('/education')
+def education():
+    """Education indicators"""
+    indicators = get_indicators_by_category_name('Education')
+    return render_template('category_indicators.html', 
+                         title='Education Indicators',
+                         indicators=indicators,
+                         active_page='education')
+
+@app.route('/economy')
+def economy():
+    """Economy indicators"""
+    # Mapping 'Economy' to 'Economy & Growth' via the LIKE query
+    indicators = get_indicators_by_category_name('Economy')
+    return render_template('category_indicators.html', 
+                         title='Economy Indicators',
+                         indicators=indicators,
+                         active_page='economy')
+
 @app.route('/indicators/add', methods=['POST'])
 def add_indicator_route():
     """Add a new indicator"""
@@ -171,4 +202,4 @@ def add_indicator_data_route():
     return redirect(url_for('countries'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
