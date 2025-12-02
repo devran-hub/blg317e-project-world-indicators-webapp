@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Data Entry Form{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-gray-900">{{ action }} Data Entry</h1>
+
+    <div class="glass-card p-8 rounded-xl">
+        <form method="POST" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                {% if action == 'Edit' %}
+                <input type="text" value="{{ data_entry.country_code }}" disabled
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-100 text-gray-500">
+                <input type="hidden" name="country_code" value="{{ data_entry.country_code }}">
+                {% else %}
+                <select name="country_code"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                    required>
+                    <option value="">Select a Country</option>
+                    {% for c in countries %}
+                    <option value="{{ c.country_code }}" {% if data_entry and data_entry.country_code==c.country_code
+                        %}selected{% endif %}>
+                        {{ c.country_name }} ({{ c.country_code }})
+                    </option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Indicator</label>
+                {% if action == 'Edit' %}
+                <input type="text" value="{{ data_entry.indicator_code }}" disabled
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-100 text-gray-500">
+                <input type="hidden" name="indicator_code" value="{{ data_entry.indicator_code }}">
+                {% else %}
+                <div class="relative searchable-dropdown" id="indicatorDropdown">
+                    <input type="hidden" name="indicator_code" id="indicatorCodeInput" required>
+
+                    <!-- Display/Search Input -->
+                    <div class="relative">
+                        <input type="text" id="indicatorSearchInput" placeholder="Select an Indicator..."
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm cursor-pointer"
+                            autocomplete="off">
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown List -->
+                    <div id="indicatorOptionsList"
+                        class="hidden absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {% for i in indicators %}
+                        <div class="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors indicator-option"
+                            data-value="{{ i.indicator_code }}"
+                            data-text="{{ i.indicator_name }} ({{ i.indicator_code }})">
+                            {{ i.indicator_name }} <span class="text-gray-400 text-xs">({{ i.indicator_code }})</span>
+                        </div>
+                        {% endfor %}
+                        <div id="noIndicatorFound" class="hidden px-4 py-2 text-sm text-gray-500 text-center">No
+                            indicators found</div>
+                    </div>
+                </div>
+
+                <script>
+                    const indDropdown = document.getElementById('indicatorDropdown');
+                    const indSearchInput = document.getElementById('indicatorSearchInput');
+                    const indOptionsList = document.getElementById('indicatorOptionsList');
+                    const indHiddenInput = document.getElementById('indicatorCodeInput');
+                    const indOptions = document.querySelectorAll('.indicator-option');
+                    const indNoResult = document.getElementById('noIndicatorFound');
+
+                    // Toggle dropdown
+                    indSearchInput.addEventListener('click', () => {
+                        indOptionsList.classList.toggle('hidden');
+                        if (!indOptionsList.classList.contains('hidden')) {
+                            indSearchInput.focus();
+                        }
+                    });
+
+                    // Filter options
+                    indSearchInput.addEventListener('input', function () {
+                        const filter = this.value.toLowerCase();
+                        let hasVisible = false;
+
+                        // Show list if user types
+                        indOptionsList.classList.remove('hidden');
+
+                        indOptions.forEach(option => {
+                            const text = option.getAttribute('data-text').toLowerCase();
+                            if (text.includes(filter)) {
+                                option.style.display = 'block';
+                                hasVisible = true;
+                            } else {
+                                option.style.display = 'none';
+                            }
+                        });
+
+                        indNoResult.classList.toggle('hidden', hasVisible);
+                    });
+
+                    // Select option
+                    indOptions.forEach(option => {
+                        option.addEventListener('click', function () {
+                            const value = this.getAttribute('data-value');
+                            const text = this.getAttribute('data-text');
+
+                            indHiddenInput.value = value;
+                            indSearchInput.value = text;
+                            indOptionsList.classList.add('hidden');
+                        });
+                    });
+
+                    // Close when clicking outside
+                    document.addEventListener('click', function (e) {
+                        if (!indDropdown.contains(e.target)) {
+                            indOptionsList.classList.add('hidden');
+                        }
+                    });
+                </script>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                {% if action == 'Edit' %}
+                <input type="text" value="{{ data_entry.year }}" disabled
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-100 text-gray-500">
+                <input type="hidden" name="year" value="{{ data_entry.year }}">
+                {% else %}
+                <input type="number" name="year" value="{{ data_entry.year if data_entry }}" placeholder="e.g. 2023"
+                    min="1960" max="2100"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                    required>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Value</label>
+                <input type="number" step="any" name="value" value="{{ data_entry.value if data_entry }}"
+                    placeholder="e.g. 10500.50"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                    required>
+            </div>
+
+            <div class="flex justify-end space-x-4 pt-4">
+                <a href="{{ url_for('indicator_data_list') }}"
+                    class="px-6 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">Cancel</a>
+                <button type="submit"
+                    class="btn-primary px-8 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
+                    {{ action }} Data Entry
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

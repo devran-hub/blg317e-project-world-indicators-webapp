@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Analyze Data - ItuWorldData{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Data Analysis</h1>
+        <p class="text-gray-600">Create custom charts by selecting a country and an indicator.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Controls -->
+        <div class="lg:col-span-1">
+            <div class="glass-card p-6 rounded-xl sticky top-24">
+                <form method="POST" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                        <select name="country_code" required
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                            <option value="">Select Country</option>
+                            {% for country in countries %}
+                            <option value="{{ country.country_code }}" {% if selected_country==country.country_code
+                                %}selected{% endif %}>
+                                {{ country.country_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Indicator</label>
+                        <select name="indicator_code" required
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                            <option value="">Select Indicator</option>
+                            {% for indicator in indicators %}
+                            <option value="{{ indicator.indicator_code }}" {% if
+                                selected_indicator==indicator.indicator_code %}selected{% endif %}>
+                                {{ indicator.indicator_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Year</label>
+                            <input type="number" name="start_year" value="{{ start_year }}" placeholder="1960"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">End Year</label>
+                            <input type="number" name="end_year" value="{{ end_year }}" placeholder="2024"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full btn-primary py-2 rounded-lg shadow-md hover:shadow-lg transition-all">
+                        Generate Chart
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Chart Area -->
+        <div class="lg:col-span-2">
+            <div class="glass-card p-6 rounded-xl h-[500px] flex flex-col">
+                {% if chart_data %}
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                    {{ chart_title }}
+                </h3>
+                <div class="relative flex-grow">
+                    <canvas id="analysisChart"></canvas>
+                </div>
+                {% else %}
+                <div class="h-full flex flex-col items-center justify-center text-gray-400">
+                    <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z">
+                        </path>
+                    </svg>
+                    <p class="text-lg">Select data to visualize</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if chart_data %}
+<script>
+    const ctx = document.getElementById('analysisChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_data | map(attribute = 'year') | list | tojson }},
+        datasets: [{
+            label: 'Value',
+            data: {{ chart_data | map(attribute = 'value') | list | tojson }},
+        borderColor: '#1a73e8',
+        backgroundColor: 'rgba(26, 115, 232, 0.1)',
+        borderWidth: 3,
+        tension: 0.3,
+        fill: true,
+        pointRadius: 4,
+        pointHoverRadius: 6
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#1f2937',
+                bodyColor: '#4b5563',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                padding: 10,
+                callbacks: {
+                    label: function (context) {
+                        let value = context.raw;
+                        if (value >= 1000000000) return (value / 1000000000).toFixed(2) + ' B';
+                        if (value >= 1000000) return (value / 1000000).toFixed(2) + ' M';
+                        return value.toLocaleString();
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                grid: { borderDash: [2, 4], color: '#f3f4f6' },
+                ticks: {
+                    callback: function (value) {
+                        if (value >= 1000000000) return (value / 1000000000).toFixed(1) + 'B';
+                        if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                        return value.toLocaleString();
+                    }
+                }
+            },
+            x: { grid: { display: false } }
+        }
+    }
+    });
+</script>
+{% endif %}
+{% endblock %}

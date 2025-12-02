@@ -3,31 +3,161 @@
 
 {% block content %}
 
-<h1 class="text-3xl font-bold mb-6">{{ action }} Country</h1>
+<div class="animate-fade-in max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-gray-900">{{ action }} Country</h1>
 
-<div class="card">
+    <div class="glass-card p-8 rounded-xl">
+        <form method="POST" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Country Code</label>
+                <input name="country_code" value="{{ country.country_code if country }}" placeholder="e.g. TUR"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                    required>
+            </div>
 
-    <form method="POST" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Country Name</label>
+                <input name="country_name" value="{{ country.country_name if country }}" placeholder="e.g. Turkey"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                    required>
+            </div>
 
-        <input name="country_code" value="{{ country.country_code if country }}" placeholder="Country Code" class="border p-2 rounded w-full">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Capital City</label>
+                <input name="capital_city" value="{{ country.capital_city if country }}" placeholder="e.g. Ankara"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm">
+            </div>
 
-        <input name="country_name" value="{{ country.country_name if country }}" placeholder="Country Name" class="border p-2 rounded w-full">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                {% if action == 'Edit' %}
+                <select name="region_id"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                    required>
+                    <option value="">Select a Region</option>
+                    {% for r in regions %}
+                    <option value="{{ r.id }}" {% if country and country.region_id==r.id %}selected{% endif %}>
+                        {{ r.region_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <div class="relative searchable-dropdown" id="regionDropdown">
+                    <input type="hidden" name="region_id" id="regionIdInput" required>
 
-        <input name="capital_city" value="{{ country.capital_city if country }}" placeholder="Capital City" class="border p-2 rounded w-full">
+                    <!-- Display/Search Input -->
+                    <div class="relative">
+                        <input type="text" id="regionSearchInput" placeholder="Select a Region..."
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm cursor-pointer"
+                            autocomplete="off">
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
 
-        <select name="region_id" class="border p-2 rounded w-full">
-            {% for r in regions %}
-            <option value="{{ r.id }}" {% if country and country.region_id==r.id %}selected{% endif %}>
-                {{ r.region_name }}
-            </option>
-            {% endfor %}
-        </select>
+                    <!-- Dropdown List -->
+                    <div id="regionOptionsList"
+                        class="hidden absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {% for r in regions %}
+                        <div class="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700 transition-colors region-option"
+                            data-value="{{ r.id }}" data-text="{{ r.region_name }}">
+                            {{ r.region_name }}
+                        </div>
+                        {% endfor %}
+                        <div id="noRegionFound" class="hidden px-4 py-2 text-sm text-gray-500 text-center">No regions
+                            found</div>
+                    </div>
+                </div>
 
-        <input name="income_level" value="{{ country.income_level if country }}" placeholder="Income Level" class="border p-2 rounded w-full">
+                <script>
+                    const dropdown = document.getElementById('regionDropdown');
+                    const searchInput = document.getElementById('regionSearchInput');
+                    const optionsList = document.getElementById('regionOptionsList');
+                    const hiddenInput = document.getElementById('regionIdInput');
+                    const options = document.querySelectorAll('.region-option');
+                    const noResult = document.getElementById('noRegionFound');
 
-        <button class="btn btn-blue w-full">{{ action }}</button>
-    </form>
+                    // Toggle dropdown
+                    searchInput.addEventListener('click', () => {
+                        optionsList.classList.toggle('hidden');
+                        if (!optionsList.classList.contains('hidden')) {
+                            searchInput.focus();
+                        }
+                    });
 
+                    // Filter options
+                    searchInput.addEventListener('input', function () {
+                        const filter = this.value.toLowerCase();
+                        let hasVisible = false;
+
+                        // Show list if user types
+                        optionsList.classList.remove('hidden');
+
+                        options.forEach(option => {
+                            const text = option.getAttribute('data-text').toLowerCase();
+                            if (text.includes(filter)) {
+                                option.style.display = 'block';
+                                hasVisible = true;
+                            } else {
+                                option.style.display = 'none';
+                            }
+                        });
+
+                        noResult.classList.toggle('hidden', hasVisible);
+                    });
+
+                    // Select option
+                    options.forEach(option => {
+                        option.addEventListener('click', function () {
+                            const value = this.getAttribute('data-value');
+                            const text = this.getAttribute('data-text');
+
+                            hiddenInput.value = value;
+                            searchInput.value = text;
+                            optionsList.classList.add('hidden');
+                        });
+                    });
+
+                    // Close when clicking outside
+                    document.addEventListener('click', function (e) {
+                        if (!dropdown.contains(e.target)) {
+                            optionsList.classList.add('hidden');
+                        }
+                    });
+                </script>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Income Level</label>
+                <select name="income_level"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                    required>
+                    <option value="">Select Income Level</option>
+                    <option value="Low income" {% if country and country.income_level=='Low income' %}selected{% endif
+                        %}>Low income</option>
+                    <option value="Lower middle income" {% if country and country.income_level=='Lower middle income'
+                        %}selected{% endif %}>Lower middle income</option>
+                    <option value="Upper middle income" {% if country and country.income_level=='Upper middle income'
+                        %}selected{% endif %}>Upper middle income</option>
+                    <option value="High income" {% if country and country.income_level=='High income' %}selected{% endif
+                        %}>High income</option>
+                </select>
+            </div>
+
+            <div class="flex justify-end space-x-4 pt-4">
+                <a href="{{ url_for('countries') }}"
+                    class="px-6 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">Cancel</a>
+                <button type="submit"
+                    class="btn-primary px-8 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
+                    {{ action }} Country
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
-
 {% endblock %}

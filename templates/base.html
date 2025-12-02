@@ -4,67 +4,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}World Development Indicators{% endblock %}</title>
+    <title>{% block title %}ItuWorldData{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/premium.css') }}">
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#fcfbf9]">
     <!-- Navigation -->
-    <nav class="nav-glass fixed w-full z-50 transition-all duration-300">
+    <nav
+        class="fixed w-full z-50 transition-all duration-300 bg-[#fcfbf9]/80 backdrop-blur-md border-b border-[#e5e0d8]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20">
                 <div class="flex items-center">
                     <a href="{{ url_for('index') }}" class="flex-shrink-0 flex items-center group">
-                        <div
-                            class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                            W
-                        </div>
-                        <span
-                            class="ml-3 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">WorldData</span>
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ItuWorldData Logo"
+                            class="h-16 w-auto group-hover:scale-105 transition-transform duration-300">
                     </a>
-                    <div class="hidden md:ml-10 md:flex md:space-x-8">
+                    <div class="hidden md:ml-10 md:flex md:space-x-4">
                         <a href="{{ url_for('index') }}"
-                            class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                        <a href="{{ url_for('health') }}"
-                            class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Health</a>
-                        <a href="{{ url_for('education') }}"
-                            class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Education</a>
+                            class="nav-link {% if request.endpoint == 'index' %}active{% endif %} text-gray-700 hover:text-black">Dashboard</a>
+                        <a href="{{ url_for('analyze') }}"
+                            class="nav-link {% if request.endpoint == 'analyze' %}active{% endif %} text-gray-700 hover:text-black">Analyze</a>
+                        <a href="{{ url_for('countries') }}"
+                            class="nav-link {% if request.endpoint == 'countries' %}active{% endif %} text-gray-700 hover:text-black">Countries</a>
                         <a href="{{ url_for('economy') }}"
-                            class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Economy</a>
+                            class="nav-link {% if request.endpoint == 'economy' %}active{% endif %} text-gray-700 hover:text-black">Economy</a>
+                        <a href="{{ url_for('health') }}"
+                            class="nav-link {% if request.endpoint == 'health' %}active{% endif %} text-gray-700 hover:text-black">Health</a>
+                        <a href="{{ url_for('education') }}"
+                            class="nav-link {% if request.endpoint == 'education' %}active{% endif %} text-gray-700 hover:text-black">Education</a>
 
                         <div
-                            class="relative group inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-blue-600 cursor-pointer">
-                            <span>More</span>
-                            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="relative group inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 cursor-pointer">
+                            <span class="nav-link text-gray-700 hover:text-black">Others</span>
+                            <svg class="ml-1 w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 9l-7 7-7-7"></path>
                             </svg>
                             <div class="absolute left-0 top-full hidden group-hover:block w-56 pt-2">
-                                <div class="glass rounded-xl p-2 shadow-2xl border border-white/50">
+                                <div class="glass rounded-lg p-2 shadow-xl border border-[#e5e0d8] bg-[#fcfbf9]">
                                     <a href="{{ url_for('regions') }}"
-                                        class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">Regions</a>
-                                    <a href="{{ url_for('countries') }}"
-                                        class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">Countries</a>
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f0ece4] rounded-md transition-colors">Regions</a>
+                                    <a href="{{ url_for('categories') }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f0ece4] rounded-md transition-colors">Categories</a>
                                     <a href="{{ url_for('indicators') }}"
-                                        class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">All
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f0ece4] rounded-md transition-colors">All
                                         Indicators</a>
                                     <a href="{{ url_for('sources') }}"
-                                        class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">Sources</a>
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f0ece4] rounded-md transition-colors">Sources</a>
+                                    <a href="{{ url_for('indicator_data_list') }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f0ece4] rounded-md transition-colors">Data
+                                        List</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center">
-                    <button class="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition-colors">
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </button>
+                <div class="flex items-center flex-1 max-w-lg ml-8">
+                    <form action="{{ url_for('search') }}" method="GET"
+                        class="search-container w-full bg-white/50 border border-[#e5e0d8] focus-within:border-gray-400">
+                        <button type="submit" class="text-gray-500 hover:text-gray-700 p-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+                        <input type="text" name="q" placeholder="Search data..." class="search-input bg-transparent"
+                            required>
+                    </form>
                 </div>
             </div>
         </div>
@@ -75,7 +85,8 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
-        <div class="glass mb-4 p-4 rounded-xl border-l-4 border-green-500 shadow-lg animate-fade-in flex items-start">
+        <div
+            class="glass mb-4 p-4 rounded-xl border-l-4 border-green-500 shadow-lg animate-fade-in flex items-start bg-[#fcfbf9]">
             <div class="flex-shrink-0">
                 <svg class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -97,10 +108,11 @@
     </main>
 
     <!-- Footer -->
-    <footer class="glass mt-auto border-t border-white/30">
+    <footer class="mt-auto border-t border-[#e5e0d8] bg-[#fcfbf9]/80 backdrop-blur-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex justify-between items-center">
-                <p class="text-gray-500 text-sm">© 2024 World Development Indicators. Crafted with ❤️.</p>
+                <p class="text-gray-500 text-sm">© 2024 ItuWorldData. Istanbul Technical University (ITU) - Database
+                    Systems Project.</p>
                 <div class="flex space-x-6">
                     <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors">Privacy</a>
                     <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors">Terms</a>
