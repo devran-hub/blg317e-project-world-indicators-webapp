@@ -16,7 +16,9 @@ from db_utils import (
     get_health_indicators,
     get_economy_indicators,
     get_education_indicators,
-    get_indicators_by_category_id
+    get_indicators_by_category_id,
+    get_indicators_with_data,
+    get_countries_with_data
 )
 import db_utils
 import pending_utils
@@ -567,8 +569,9 @@ def indicator_data_list():
 @app.route('/analyze', methods=['GET', 'POST'])
 def analyze():
     """Custom chart builder"""
-    countries, _ = db_utils.get_all_countries(per_page=10000)
-    indicators, _ = db_utils.get_all_indicators(per_page=10000)
+    # Only get countries and indicators that have actual data
+    countries = db_utils.get_countries_with_data()
+    indicators = db_utils.get_indicators_with_data()
     
     chart_data = None
     selected_country = None

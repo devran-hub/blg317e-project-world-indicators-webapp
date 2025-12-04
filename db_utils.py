@@ -620,3 +620,37 @@ def update_category(id, name, description):
 
 def delete_category(id):
     return execute("DELETE FROM IndicatorCategories WHERE id = %s", (id,))
+
+
+# ---------------------------------------------
+# INDICATORS WITH DATA (for Analyze page)
+# ---------------------------------------------
+def get_indicators_with_data():
+    """Get only indicators that have actual data in IndicatorData table"""
+    return execute(
+        """
+        SELECT DISTINCT I.indicator_code, I.indicator_name, I.source_id, I.category_id, I.long_definition,
+               C.category_name, S.source_name
+        FROM Indicators I
+        INNER JOIN IndicatorData D ON I.indicator_code = D.indicator_code
+        LEFT JOIN IndicatorCategories C ON I.category_id = C.id
+        LEFT JOIN Sources S ON I.source_id = S.id
+        ORDER BY I.indicator_name
+        """,
+        fetch=True
+    )
+
+
+def get_countries_with_data():
+    """Get only countries that have actual data in IndicatorData table"""
+    return execute(
+        """
+        SELECT DISTINCT C.country_code, C.country_name, C.capital_city, C.region_id, C.income_level,
+               R.region_name
+        FROM Countries C
+        INNER JOIN IndicatorData D ON C.country_code = D.country_code
+        LEFT JOIN Regions R ON C.region_id = R.id
+        ORDER BY C.country_name
+        """,
+        fetch=True
+    )
