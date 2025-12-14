@@ -1,3 +1,8 @@
+import pandas as pd
+from io import BytesIO
+from flask import send_file
+from datetime import datetime
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from db_utils import (
     get_all_regions, add_region,
@@ -650,6 +655,65 @@ def analyze():
                          start_year=start_year,
                          end_year=end_year,
                          chart_title=chart_title)
+
+@app.route('/export', methods=['POST'])
+def export_data():
+    """Export analyzed data to Excel"""
+    # 1. Formdan verileri al (Analyze ile aynı mantık)
+    selected_countries = request.form.getlist('country_code') # Çoklu seçim
+    # Eğer frontend'de 'country_code_2' ayrı bir input ise onu da listeye ekle:
+    if request.form.get('country_code_2'):
+        selected_countries.append(request.form.get('country_code_2'))
+        
+    selected_indicator = request.form.get('indicator_code')
+    start_year = request.form.get('start_year')
+    end_year = request.form.get('end_year')
+
+    # 2. Veri yoksa geri gönder
+    if not selected_countries or not selected_indicator:
+        flash('Please select countries and an indicator to export.', 'warning')
+        return redirect(url_for('analyze'))
+
+    # 3. Veritabanından veriyi çek
+    raw_data = db_utils.get_chart_data(selected_countries, selected_indicator, start_year, end_year)
+    
+    if not raw_data:
+        flash('No data found to export.', 'warning')
+        return redirect(url_for('analyze'))
+
+    # 4. Pandas DataFrame oluştur (Veri manipülasyonu için)
+    df = pd.DataFrame(raw_data)
+    
+    # 5. Veriyi daha okunabilir hale getir
+    # Sütun isimlerini düzelt
+    df = df.rename(columns={
+        'country_code': 'Country Code',
+        'year': 'Year', 
+        'value': 'Value'
+    })
+    
+    # İsteğe bağlı: Ülke isimlerini de ekleyebilirsin (db_utils'den çekip mergeleyerek)
+    # Şimdilik ham veri yeterli.
+
+    # 6. Excel dosyasını RAM'de (Memory) oluştur
+    output = BytesIO()
+    # ExcelWriter kullanarak meta data ve sheet ismi ayarla
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Data_Analysis')
+        
+    # Pointer'ı dosyanın başına al
+    output.seek(0)
+    
+    # 7. Dosya ismi oluştur (Dinamik ve tarihli olsun)
+    filename = f"export_{selected_indicator}_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+
+    # 8. İndirme işlemi başlat
+    return send_file(
+        output,
+        download_name=filename,
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
 
 @app.route('/data/<country_code>')
 def indicator_data(country_code):
