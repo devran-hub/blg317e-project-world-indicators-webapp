@@ -574,33 +574,78 @@ def analyze():
     indicators = db_utils.get_indicators_with_data()
     
     chart_data = None
-    selected_country = None
+    selected_countries = []
     selected_indicator = None
     start_year = None
     end_year = None
     chart_title = ""
     
     if request.method == 'POST':
-        selected_country = request.form.get('country_code')
+        # Get list of selected countries
+        selected_countries = request.form.getlist('country_code')
         selected_indicator = request.form.get('indicator_code')
         start_year = request.form.get('start_year')
         end_year = request.form.get('end_year')
         
-        if selected_country and selected_indicator:
-            chart_data = db_utils.get_chart_data(selected_country, selected_indicator, start_year, end_year)
+        if selected_countries and selected_indicator:
+            raw_data = db_utils.get_chart_data(selected_countries, selected_indicator, start_year, end_year)
+            
+            if raw_data:
+                # Process data for Chart.js
+                # 1. Get all unique years and sort them
+                years = sorted(list(set(d['year'] for d in raw_data)))
+                
+                # 2. Group data by country
+                datasets = {}
+                for entry in raw_data:
+                    cc = entry['country_code']
+                    if cc not in datasets:
+                        datasets[cc] = {year: None for year in years}
+                    datasets[cc][entry['year']] = entry['value']
+                
+                # 3. Format into a list of datasets
+                final_datasets = []
+                country_map = {c['country_code']: c['country_name'] for c in countries}
+                
+                # Simple color palette generator
+                colors = [
+                    '#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', 
+                    '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac'
+                ]
+                
+                for i, (cc, values_map) in enumerate(datasets.items()):
+                    # Create data array matching the sorted years order, handle missing years
+                    data_points = [values_map.get(year) for year in years]
+                    
+                    color = colors[i % len(colors)]
+                    final_datasets.append({
+                        'label': country_map.get(cc, cc),
+                        'data': data_points,
+                        'borderColor': color,
+                        'backgroundColor': color,
+                        'fill': False
+                    })
+                
+                chart_data = {
+                    'labels': years,
+                    'datasets': final_datasets
+                }
             
             # Get names for title
-            country = db_utils.get_country_by_code(selected_country)
             indicator = db_utils.get_indicator_by_code(selected_indicator)
             
-            if country and indicator:
-                chart_title = f"{indicator['indicator_name']} - {country['country_name']}"
+            if indicator:
+                if len(selected_countries) == 1:
+                    country_name = next((c['country_name'] for c in countries if c['country_code'] == selected_countries[0]), selected_countries[0])
+                    chart_title = f"{indicator['indicator_name']} - {country_name}"
+                else:
+                    chart_title = f"{indicator['indicator_name']} - {len(selected_countries)} Countries Comparison"
     
     return render_template('analyze.html',
                          countries=countries,
                          indicators=indicators,
                          chart_data=chart_data,
-                         selected_country=selected_country,
+                         selected_countries=selected_countries,
                          selected_indicator=selected_indicator,
                          start_year=start_year,
                          end_year=end_year,

@@ -399,13 +399,23 @@ def get_global_gdp():
 def get_global_life_expectancy():
     return get_yearly_indicator_average("SP.DYN.LE00.IN")
 
-def get_chart_data(country_code, indicator_code, start_year=None, end_year=None):
-    query = """
-        SELECT year, value 
+def get_chart_data(country_codes, indicator_code, start_year=None, end_year=None):
+    if isinstance(country_codes, str):
+        country_codes = [country_codes]
+        
+    if not country_codes:
+        return []
+
+    # Create placeholders for IN clause
+    placeholders = ', '.join(['%s'] * len(country_codes))
+    
+    query = f"""
+        SELECT country_code, year, value 
         FROM IndicatorData 
-        WHERE country_code = %s AND indicator_code = %s
+        WHERE country_code IN ({placeholders}) AND indicator_code = %s
     """
-    params = [country_code, indicator_code]
+    
+    params = country_codes + [indicator_code]
     
     if start_year:
         query += " AND year >= %s"
