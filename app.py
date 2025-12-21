@@ -196,8 +196,8 @@ def edit_country(code):
         region_id = request.form.get('region_id')
         income_level = request.form.get('income_level')
         
-        if new_code and name and region_id and income_level:
-            db_utils.update_country(code, new_code, name, capital, region_id, income_level)
+        if name and region_id and income_level:
+            db_utils.update_country(code, name, capital, region_id, income_level)
             flash(f'Country "{name}" updated successfully!', 'success')
             return redirect(url_for('countries'))
     

@@ -185,15 +185,15 @@ def add_country(code, name, capital, region_id, income):
         (code, name, capital, region_id, income)
     )
 
-def update_country(original_code, new_code, name, capital, region, income):
+def update_country(code, name, capital, region, income):
     return execute(
         """
         UPDATE Countries
-        SET country_code=%s, country_name=%s, capital_city=%s,
+        SET country_name=%s, capital_city=%s,
             region_id=%s, income_level=%s
         WHERE country_code=%s
         """,
-        (new_code, name, capital, region, income, original_code)
+        (name, capital, region, income, code)
     )
 
 def delete_country(code):
