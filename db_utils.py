@@ -513,7 +513,7 @@ def get_economy_indicators(page=1, per_page=1000, search_query=None):
         
         items = execute(f"""
             SELECT i.*, s.source_name, c.category_name,
-            EXISTS(SELECT 1 FROM IndicatorData d WHERE d.indicator_code = i.indicator_code) as has_data
+            (SELECT COUNT(*) FROM IndicatorData d WHERE d.indicator_code = i.indicator_code) as has_data
             FROM EconomyIndicators i
             LEFT JOIN Sources s ON i.source_id = s.id
             LEFT JOIN IndicatorCategories c ON i.category_id = c.id
@@ -527,7 +527,7 @@ def get_economy_indicators(page=1, per_page=1000, search_query=None):
         
         items = execute(f"""
             SELECT i.*, s.source_name, c.category_name,
-            EXISTS(SELECT 1 FROM IndicatorData d WHERE d.indicator_code = i.indicator_code) as has_data
+            (SELECT COUNT(*) FROM IndicatorData d WHERE d.indicator_code = i.indicator_code) as has_data
             FROM EconomyIndicators i
             LEFT JOIN Sources s ON i.source_id = s.id
             LEFT JOIN IndicatorCategories c ON i.category_id = c.id
@@ -551,12 +551,13 @@ def get_education_indicators(page=1, per_page=1000, search_query=None):
         
         items = execute(f"""
             SELECT i.*, s.source_name, c.category_name,
-            EXISTS(SELECT 1 FROM IndicatorData d WHERE d.indicator_code = i.indicator_code) as has_data
+            EXISTS(SELECT 1 FROM IndicatorData d WHERE d.indicator_code = i.indicator_code) as has_data,
+            (CASE WHEN i.long_definition IS NOT NULL AND i.long_definition != '' THEN 1 ELSE 0 END) as is_well_defined
             FROM EducationIndicators i
             LEFT JOIN Sources s ON i.source_id = s.id
             LEFT JOIN IndicatorCategories c ON i.category_id = c.id
             WHERE i.indicator_name LIKE %s OR i.indicator_code LIKE %s
-            ORDER BY has_data DESC, i.indicator_name ASC
+            ORDER BY has_data DESC,is_well_defined DESC, i.indicator_name ASC
             LIMIT {per_page} OFFSET {offset}
         """, (f"%{search_query}%", f"%{search_query}%"), fetch=True)
     else:
@@ -565,11 +566,12 @@ def get_education_indicators(page=1, per_page=1000, search_query=None):
         
         items = execute(f"""
             SELECT i.*, s.source_name, c.category_name,
-            EXISTS(SELECT 1 FROM IndicatorData d WHERE d.indicator_code = i.indicator_code) as has_data
+            EXISTS(SELECT 1 FROM IndicatorData d WHERE d.indicator_code = i.indicator_code) as has_data,
+            (CASE WHEN i.long_definition IS NOT NULL AND i.long_definition != '' THEN 1 ELSE 0 END) as is_well_defined
             FROM EducationIndicators i
             LEFT JOIN Sources s ON i.source_id = s.id
             LEFT JOIN IndicatorCategories c ON i.category_id = c.id
-            ORDER BY has_data DESC, i.indicator_name ASC
+            ORDER BY has_data DESC,is_well_defined DESC, i.indicator_name ASC
             LIMIT {per_page} OFFSET {offset}
         """, fetch=True)
     
