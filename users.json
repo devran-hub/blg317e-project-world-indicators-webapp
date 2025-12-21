@@ -1,0 +1,16 @@
+{
+    "users": [
+        {
+            "username": "huseynov",
+            "password_hash": "pbkdf2:sha256:1000000$uemv9GZM6vHsMRsI$268a8f0d28cc64f35ec189110839b4c0591ea7b8569bdddab0e0b7557af9800d",
+            "role": "admin",
+            "is_approved": true
+        },
+        {
+            "username": "ali",
+            "password_hash": "pbkdf2:sha256:1000000$HPYIN4UuzWGTZsyA$6ebf0768580889f47e5b36105dd13ef058698564983c290d4aa340e58d67fce6",
+            "role": "admin",
+            "is_approved": true
+        }
+    ]
+}

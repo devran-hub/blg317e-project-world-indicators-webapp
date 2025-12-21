@@ -26,11 +26,14 @@ from db_utils import (
     get_countries_with_data
 )
 import db_utils
-import pending_utils
 import auth
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here-change-in-production'
+
+@app.context_processor
+def inject_auth():
+    return dict(auth_module=auth)
 
 @app.route('/search')
 def search():
@@ -83,6 +86,7 @@ def index():
     gdp_data = db_utils.get_global_gdp()
     life_expectancy_data = db_utils.get_global_life_expectancy()
     country_populations = db_utils.get_latest_population_by_country()
+    country_gdp = db_utils.get_latest_gdp_by_country()
     recent_activity = db_utils.get_recent_activity()
     
     return render_template('index.html',
@@ -94,6 +98,7 @@ def index():
                          gdp_data=gdp_data,
                          life_expectancy_data=life_expectancy_data,
                          country_populations=country_populations,
+                         country_gdp=country_gdp,
                          recent_activity=recent_activity)
 
 @app.route('/regions')
@@ -104,6 +109,7 @@ def regions():
     return render_template('regions.html', regions=all_regions, search=search)
 
 @app.route('/regions/add', methods=['GET', 'POST'])
+@auth.login_required
 def add_region_route():
     """Add a new region"""
     if request.method == 'POST':
@@ -111,14 +117,14 @@ def add_region_route():
         code = request.form.get('region_code')
         
         if name:
-            data = {'region_name': name, 'region_code': code}
-            pending_utils.submit_change('Regions', 'INSERT', data)
-            flash(f'Region "{name}" submitted for approval!', 'info')
+            db_utils.add_region(name, code)
+            flash(f'Region "{name}" added successfully!', 'success')
             return redirect(url_for('regions'))
             
     return render_template('region_form.html', action="Add")
 
 @app.route('/regions/edit/<int:id>', methods=['GET', 'POST'])
+@auth.login_required
 def edit_region(id):
     """Edit a region"""
     if request.method == 'POST':
@@ -126,21 +132,21 @@ def edit_region(id):
         code = request.form.get('region_code')
         
         if name:
-            data = {'region_name': name, 'region_code': code}
-            pending_utils.submit_change('Regions', 'UPDATE', data, record_id=id)
-            flash(f'Changes for "{name}" submitted for approval!', 'info')
+            db_utils.update_region(id, name, code)
+            flash(f'Region "{name}" updated successfully!', 'success')
             return redirect(url_for('regions'))
             
     region = db_utils.get_region_by_id(id)
     return render_template('region_form.html', action="Edit", region=region)
 
 @app.route('/regions/delete/<int:id>')
+@auth.login_required
 def delete_region_route(id):
     """Delete a region"""
     region = db_utils.get_region_by_id(id)
     if region:
-        pending_utils.submit_change('Regions', 'DELETE', {}, record_id=id)
-        flash(f'Deletion request for "{region["region_name"]}" submitted for approval!', 'info')
+        db_utils.delete_region(id)
+        flash(f'Region "{region["region_name"]}" deleted successfully!', 'success')
     return redirect(url_for('regions'))
 
 @app.route('/countries')
@@ -160,6 +166,7 @@ def countries():
                          search=search)
 
 @app.route('/countries/add', methods=['GET', 'POST'])
+@auth.login_required
 def add_country_route():
     """Add a new country"""
     if request.method == 'POST':
@@ -170,16 +177,8 @@ def add_country_route():
         income_level = request.form.get('income_level')
         
         if code and name and region_id and income_level:
-            # Submit to pending changes instead of direct add
-            data = {
-                'country_code': code,
-                'country_name': name,
-                'capital_city': capital,
-                'region_id': region_id,
-                'income_level': income_level
-            }
-            pending_utils.submit_change('Countries', 'INSERT', data)
-            flash(f'Country "{name}" submitted for approval!', 'info')
+            db_utils.add_country(code, name, capital, region_id, income_level)
+            flash(f'Country "{name}" added successfully!', 'success')
             return redirect(url_for('countries'))
             
     # GET request: Show form
@@ -187,6 +186,7 @@ def add_country_route():
     return render_template('country_form.html', action="Add", regions=all_regions)
 
 @app.route('/countries/edit/<code>', methods=['GET', 'POST'])
+@auth.login_required
 def edit_country(code):
     """Edit a country"""
     if request.method == 'POST':
@@ -197,16 +197,8 @@ def edit_country(code):
         income_level = request.form.get('income_level')
         
         if new_code and name and region_id and income_level:
-            data = {
-                'country_code': new_code,
-                'country_name': name,
-                'capital_city': capital,
-                'region_id': region_id,
-                'income_level': income_level
-            }
-            # For update, we pass the original code as record_id
-            pending_utils.submit_change('Countries', 'UPDATE', data, record_id=code)
-            flash(f'Changes for "{name}" submitted for approval!', 'info')
+            db_utils.update_country(code, new_code, name, capital, region_id, income_level)
+            flash(f'Country "{name}" updated successfully!', 'success')
             return redirect(url_for('countries'))
     
     country = get_country_by_code(code)
@@ -214,12 +206,13 @@ def edit_country(code):
     return render_template('country_form.html', action="Edit", country=country, regions=all_regions)
 
 @app.route('/countries/delete/<code>')
+@auth.login_required
 def delete_country_route(code):
     """Delete a country"""
     country = get_country_by_code(code)
     if country:
-        pending_utils.submit_change('Countries', 'DELETE', {}, record_id=code)
-        flash(f'Deletion request for "{country["country_name"]}" submitted for approval!', 'info')
+        db_utils.delete_country(code)
+        flash(f'Country "{country["country_name"]}" deleted successfully!', 'success')
     return redirect(url_for('countries'))
 
 @app.route('/sources')
@@ -230,6 +223,7 @@ def sources():
     return render_template('sources.html', sources=all_sources, search=search)
 
 @app.route('/sources/add', methods=['GET', 'POST'])
+@auth.login_required
 def add_source_route():
     """Add a new source"""
     if request.method == 'POST':
@@ -239,19 +233,14 @@ def add_source_route():
         desc = request.form.get('description')
         
         if name:
-            data = {
-                'source_name': name,
-                'source_organization': org,
-                'source_url': url,
-                'description': desc
-            }
-            pending_utils.submit_change('Sources', 'INSERT', data)
-            flash(f'Source "{name}" submitted for approval!', 'info')
+            db_utils.add_source(name, org, url, desc)
+            flash(f'Source "{name}" added successfully!', 'success')
             return redirect(url_for('sources'))
             
     return render_template('source_form.html', action="Add")
 
 @app.route('/sources/edit/<int:id>', methods=['GET', 'POST'])
+@auth.login_required
 def edit_source(id):
     """Edit a source"""
     if request.method == 'POST':
@@ -261,26 +250,21 @@ def edit_source(id):
         desc = request.form.get('description')
         
         if name:
-            data = {
-                'source_name': name,
-                'source_organization': org,
-                'source_url': url,
-                'description': desc
-            }
-            pending_utils.submit_change('Sources', 'UPDATE', data, record_id=id)
-            flash(f'Changes for "{name}" submitted for approval!', 'info')
+            db_utils.update_source(id, name, org, url, desc)
+            flash(f'Source "{name}" updated successfully!', 'success')
             return redirect(url_for('sources'))
             
     source = db_utils.get_source_by_id(id)
     return render_template('source_form.html', action="Edit", source=source)
 
 @app.route('/sources/delete/<int:id>')
+@auth.login_required
 def delete_source_route(id):
     """Delete a source"""
     source = db_utils.get_source_by_id(id)
     if source:
-        pending_utils.submit_change('Sources', 'DELETE', {}, record_id=id)
-        flash(f'Deletion request for "{source["source_name"]}" submitted for approval!', 'info')
+        db_utils.delete_source(id)
+        flash(f'Source "{source["source_name"]}" deleted successfully!', 'success')
     return redirect(url_for('sources'))
 
 @app.route('/indicators')
@@ -317,6 +301,7 @@ def categories():
                          search=search)
 
 @app.route('/categories/add', methods=['GET', 'POST'])
+@auth.login_required
 def add_category_route():
     """Add a new category"""
     if request.method == 'POST':
@@ -324,14 +309,14 @@ def add_category_route():
         description = request.form.get('description')
         
         if name:
-            data = {'category_name': name, 'description': description}
-            pending_utils.submit_change('IndicatorCategories', 'INSERT', data)
-            flash(f'Category "{name}" submitted for approval!', 'info')
+            db_utils.add_category(name, description)
+            flash(f'Category "{name}" added successfully!', 'success')
             return redirect(url_for('categories'))
             
     return render_template('category_form.html', action="Add")
 
 @app.route('/categories/edit/<int:id>', methods=['GET', 'POST'])
+@auth.login_required
 def edit_category(id):
     """Edit a category"""
     if request.method == 'POST':
@@ -339,21 +324,21 @@ def edit_category(id):
         description = request.form.get('description')
         
         if name:
-            data = {'category_name': name, 'description': description}
-            pending_utils.submit_change('IndicatorCategories', 'UPDATE', data, record_id=id)
-            flash(f'Changes for "{name}" submitted for approval!', 'info')
+            db_utils.update_category(id, name, description)
+            flash(f'Category "{name}" updated successfully!', 'success')
             return redirect(url_for('categories'))
             
     category = db_utils.get_category_by_id(id)
     return render_template('category_form.html', action="Edit", category=category)
 
 @app.route('/categories/delete/<int:id>')
+@auth.login_required
 def delete_category_route(id):
     """Delete a category"""
     category = db_utils.get_category_by_id(id)
     if category:
-        pending_utils.submit_change('IndicatorCategories', 'DELETE', {}, record_id=id)
-        flash(f'Deletion request for "{category["category_name"]}" submitted for approval!', 'info')
+        db_utils.delete_category(id)
+        flash(f'Category "{category["category_name"]}" deleted successfully!', 'success')
     return redirect(url_for('categories'))
 
 @app.route('/categories/<int:category_id>')
@@ -430,6 +415,7 @@ def economy():
                          search=search)
 
 @app.route('/indicators/add', methods=['GET', 'POST'])
+@auth.login_required
 def add_indicator_route():
     """Add a new indicator"""
     if request.method == 'POST':
@@ -440,15 +426,8 @@ def add_indicator_route():
         definition = request.form.get('long_definition')
         
         if code and name and source_id and category_id:
-            data = {
-                'indicator_code': code,
-                'indicator_name': name,
-                'source_id': source_id,
-                'category_id': category_id,
-                'long_definition': definition
-            }
-            pending_utils.submit_change('Indicators', 'INSERT', data)
-            flash(f'Indicator "{name}" submitted for approval!', 'info')
+            db_utils.add_indicator(code, name, source_id, category_id, definition)
+            flash(f'Indicator "{name}" added successfully!', 'success')
             return redirect(url_for('indicators'))
             
     all_sources = db_utils.get_all_sources()
@@ -456,6 +435,7 @@ def add_indicator_route():
     return render_template('indicator_form.html', action="Add", sources=all_sources, categories=all_categories)
 
 @app.route('/indicators/edit/<code>', methods=['GET', 'POST'])
+@auth.login_required
 def edit_indicator(code):
     """Edit an indicator"""
     if request.method == 'POST':
@@ -466,15 +446,8 @@ def edit_indicator(code):
         definition = request.form.get('long_definition')
         
         if new_code and name and source_id and category_id:
-            data = {
-                'indicator_code': new_code,
-                'indicator_name': name,
-                'source_id': source_id,
-                'category_id': category_id,
-                'long_definition': definition
-            }
-            pending_utils.submit_change('Indicators', 'UPDATE', data, record_id=code)
-            flash(f'Changes for "{name}" submitted for approval!', 'info')
+            db_utils.update_indicator(new_code, name, source_id, category_id, definition)
+            flash(f'Indicator "{name}" updated successfully!', 'success')
             return redirect(url_for('indicators'))
             
     indicator = db_utils.get_indicator_by_code(code)
@@ -483,12 +456,13 @@ def edit_indicator(code):
     return render_template('indicator_form.html', action="Edit", indicator=indicator, sources=all_sources, categories=all_categories)
 
 @app.route('/indicators/delete/<code>')
+@auth.login_required
 def delete_indicator_route(code):
     """Delete an indicator"""
     indicator = db_utils.get_indicator_by_code(code)
     if indicator:
-        pending_utils.submit_change('Indicators', 'DELETE', {}, record_id=code)
-        flash(f'Deletion request for "{indicator["indicator_name"]}" submitted for approval!', 'info')
+        db_utils.delete_indicator(code)
+        flash(f'Indicator "{indicator["indicator_name"]}" deleted successfully!', 'success')
     return redirect(url_for('indicators'))
 
 @app.route('/data')
@@ -728,6 +702,7 @@ def indicator_data(country_code):
                          indicators=all_indicators)
 
 @app.route('/data/add', methods=['GET', 'POST'])
+@auth.login_required
 def add_data_route():
     """Add new indicator data"""
     if request.method == 'POST':
@@ -737,14 +712,8 @@ def add_data_route():
         value = request.form.get('value')
         
         if country_code and indicator_code and year and value:
-            data = {
-                'country_code': country_code,
-                'indicator_code': indicator_code,
-                'year': year,
-                'value': value
-            }
-            pending_utils.submit_change('IndicatorData', 'INSERT', data)
-            flash('Data entry submitted for approval!', 'info')
+            db_utils.add_indicator_data(country_code, indicator_code, year, value, None)
+            flash('Data entry added successfully!', 'success')
             return redirect(url_for('indicator_data_list'))
             
     all_countries, _ = get_all_countries(per_page=1000)
@@ -752,28 +721,26 @@ def add_data_route():
     return render_template('data_form.html', action="Add", countries=all_countries, indicators=all_indicators)
 
 @app.route('/data/edit/<country_code>/<indicator_code>/<year>', methods=['GET', 'POST'])
+@auth.login_required
 def edit_data(country_code, indicator_code, year):
     """Edit indicator data"""
     if request.method == 'POST':
         value = request.form.get('value')
         
         if value:
-            data = {'value': value}
-            # Composite key for record_id
-            record_id = f"{country_code}|{indicator_code}|{year}"
-            pending_utils.submit_change('IndicatorData', 'UPDATE', data, record_id=record_id)
-            flash('Changes submitted for approval!', 'info')
+            db_utils.update_indicator_data(country_code, indicator_code, year, value)
+            flash('Data updated successfully!', 'success')
             return redirect(url_for('indicator_data_list'))
             
     data_entry = db_utils.get_data_by_composite_key(country_code, indicator_code, year)
     return render_template('data_form.html', action="Edit", data_entry=data_entry)
 
 @app.route('/data/delete/<country_code>/<indicator_code>/<year>')
+@auth.login_required
 def delete_data_route(country_code, indicator_code, year):
     """Delete indicator data"""
-    record_id = f"{country_code}|{indicator_code}|{year}"
-    pending_utils.submit_change('IndicatorData', 'DELETE', {}, record_id=record_id)
-    flash('Deletion request submitted for approval!', 'info')
+    db_utils.delete_indicator_data(country_code, indicator_code, year)
+    flash('Data entry deleted successfully!', 'success')
     return redirect(url_for('indicator_data_list'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -783,11 +750,13 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        if auth.login_user(username, password):
-            flash('Welcome back, Admin!', 'success')
-            return redirect(url_for('admin_panel'))
+        success, message = auth.login_user(username, password)
+        
+        if success:
+            flash(f'Welcome back, {username}!', 'success')
+            return redirect(url_for('index'))
         else:
-            flash('Invalid username or password', 'error')
+            flash(message, 'error')
             
     return render_template('login.html')
 
@@ -798,31 +767,62 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
-@app.route('/admin')
-@auth.login_required
-def admin_panel():
-    """Admin panel to view pending changes"""
-    pending_changes = pending_utils.get_pending_changes()
-    return render_template('admin.html', changes=pending_changes)
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """Handle user registration"""
+    if auth.is_logged_in():
+        return redirect(url_for('index'))
+        
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if password != confirm_password:
+            flash('Passwords do not match', 'error')
+            return render_template('register.html')
+        
+        success, message = auth.register_user(username, email, password)
+        
+        if success:
+            flash('Registration successful! Please login.', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash(message, 'error')
+            
+    return render_template('register.html')
 
-@app.route('/admin/approve/<int:change_id>')
+@app.route('/admin/users')
 @auth.login_required
-def approve_change_route(change_id):
-    """Approve a pending change"""
-    success, message = pending_utils.approve_change(change_id)
+def admin_users():
+    """Admin panel to view pending users"""
+    pending_users = auth.get_pending_users()
+    return render_template('admin_users.html', users=pending_users)
+
+@app.route('/admin/approve/<username>')
+@auth.login_required
+def approve_user_route(username):
+    """Approve a pending user"""
+    success, message = auth.approve_user(username)
     if success:
-        flash(message, 'success')
+        flash(f'User {username} approved!', 'success')
     else:
-        flash(f'Error: {message}', 'error')
-    return redirect(url_for('admin_panel'))
+        flash(message, 'error')
+    return redirect(url_for('admin_users'))
 
-@app.route('/admin/reject/<int:change_id>')
+@app.route('/admin/reject/<username>')
 @auth.login_required
-def reject_change_route(change_id):
-    """Reject a pending change"""
-    pending_utils.reject_change(change_id)
-    flash('Change rejected', 'info')
-    return redirect(url_for('admin_panel'))
+def reject_user_route(username):
+    """Reject a pending user"""
+    success, message = auth.reject_user(username)
+    if success:
+        flash(f'User {username} rejected and removed.', 'info')
+    else:
+        flash(message, 'error')
+    return redirect(url_for('admin_users'))
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

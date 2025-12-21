@@ -336,14 +336,7 @@ def get_data_by_composite_key(country_code, indicator_code, year):
     )
     return result[0] if result else None
 
-def add_indicator_data(country_code, indicator_code, year, value):
-    return execute(
-        """
-        INSERT INTO IndicatorData (country_code, indicator_code, year, value)
-        VALUES (%s, %s, %s, %s)
-        """,
-        (country_code, indicator_code, year, value)
-    )
+
 
 def update_indicator_data(country_code, indicator_code, year, value):
     return execute(
@@ -370,8 +363,7 @@ def add_indicator_data(country_code, indicator_code, year, value, footnote):
         (country_code, indicator_code, year, value, footnote)
     )
 
-def delete_indicator_data(id):
-    return execute("DELETE FROM IndicatorData WHERE id=%s", (id,))
+
 
 
 # ---------------------------------------------
@@ -461,6 +453,27 @@ def get_latest_population_by_country():
         """,
         fetch=True
     )
+
+
+def get_latest_gdp_by_country():
+    return execute(
+        """
+        SELECT C.country_name, D.value AS gdp, D.year
+        FROM IndicatorData D
+        JOIN Countries C ON C.country_code = D.country_code
+        WHERE D.indicator_code='NY.GDP.MKTP.CD'
+        AND D.year = (
+            SELECT MAX(year)
+            FROM IndicatorData
+            WHERE country_code = D.country_code
+            AND indicator_code='NY.GDP.MKTP.CD'
+        )
+        ORDER BY D.value DESC
+        LIMIT 5
+        """,
+        fetch=True
+    )
+
 def get_health_indicators(page=1, per_page=1000, search_query=None):
     offset = (page - 1) * per_page
     

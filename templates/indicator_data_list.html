@@ -9,12 +9,14 @@
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Indicator Data</h1>
             <p class="text-gray-600">Browse all indicator data entries across countries and years</p>
         </div>
+        {% if session.get('logged_in') %}
         <a href="{{ url_for('add_data_route') }}" class="btn-primary flex items-center">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
             Add Data
         </a>
+        {% endif %}
     </div>
 
     <!-- Search Bar -->
@@ -71,11 +73,13 @@
                             {{ "{:,.2f}".format(item.value) if item.value else 'N/A' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            {% if session.get('logged_in') %}
                             <a href="{{ url_for('edit_data', country_code=item.country_code, indicator_code=item.indicator_code, year=item.year) }}"
                                 class="text-blue-600 hover:text-blue-900 mr-3 font-medium transition-colors">Edit</a>
                             <a href="{{ url_for('delete_data_route', country_code=item.country_code, indicator_code=item.indicator_code, year=item.year) }}"
                                 class="text-red-600 hover:text-red-900 font-medium transition-colors"
                                 onclick="return confirm('Are you sure you want to delete this entry?')">Delete</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

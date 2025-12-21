@@ -169,21 +169,21 @@
         </div>
     </div>
 
-    <!-- Top Countries by Population -->
+    <!-- Top Countries by GDP -->
     <div class="glass-card p-6 rounded-2xl animate-fade-in delay-800">
-        <h3 class="text-lg font-bold text-gray-900 mb-4">Most Populous Nations</h3>
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Highest GDP Nations</h3>
         <div class="space-y-4">
-            {% for country in country_populations[:5] %}
+            {% for country in country_gdp %}
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
                     <div
-                        class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600 mr-3">
+                        class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600 mr-3">
                         {{ loop.index }}
                     </div>
                     <span class="text-sm font-medium text-gray-900">{{ country.country_name }}</span>
                 </div>
                 <span class="text-sm text-gray-600 font-mono">
-                    {{ "%.1f"|format(country.population / 1000000) }}M
+                    ${{ "%.2f"|format(country.gdp / 1000000000000) }}T
                 </span>
             </div>
             {% endfor %}
