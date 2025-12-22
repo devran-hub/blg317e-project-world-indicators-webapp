@@ -45,7 +45,7 @@ CREATE TABLE `EducationIndicators` (
   KEY `source_id` (`source_id`),
   KEY `category_id` (`category_id`),
   CONSTRAINT `educationindicators_ibfk_1` FOREIGN KEY (`source_id`) REFERENCES `Sources` (`id`),
-  CONSTRAINT `educationindicators_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `IndicatorCategories` (`id`)
+  CONSTRAINT `educationindicators_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `IndicatorCategories` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=4096 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
