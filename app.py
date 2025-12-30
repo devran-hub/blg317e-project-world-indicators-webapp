@@ -431,7 +431,7 @@ def add_indicator_route():
             return redirect(url_for('indicators'))
             
     all_sources = db_utils.get_all_sources()
-    all_categories = db_utils.get_all_categories()
+    all_categories, _ = db_utils.get_all_categories()
     return render_template('indicator_form.html', action="Add", sources=all_sources, categories=all_categories)
 
 @app.route('/indicators/edit/<code>', methods=['GET', 'POST'])
@@ -452,7 +452,7 @@ def edit_indicator(code):
             
     indicator = db_utils.get_indicator_by_code(code)
     all_sources = db_utils.get_all_sources()
-    all_categories = db_utils.get_all_categories()
+    all_categories, _ = db_utils.get_all_categories()
     return render_template('indicator_form.html', action="Edit", indicator=indicator, sources=all_sources, categories=all_categories)
 
 @app.route('/indicators/delete/<code>')

@@ -147,7 +147,7 @@ def main():
     for ind in indicators:
         src = ind.get("source", {})
         sid = src.get("id")
-        if sid:
+        if sid: 
             source_map[sid] = {
                 "name": src.get("value"),
                 "organization": src.get("organization"),
